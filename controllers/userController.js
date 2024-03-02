@@ -1,4 +1,15 @@
+const { json } = require('express');
 const User = require('../model/userModel');
+
+const filterObj = (obj, ...allowFields) => {
+  const newObj = {};
+  Object.keys(obj).forEach(el => {
+    if (allowFields.includes(el)) {
+      newObj[el] = obj[el];
+    }
+  });
+  return newObj;
+};
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -43,4 +54,22 @@ exports.deleteUser = (req, res) => {
     status: 'error',
     message: 'This route is not yet defined!'
   });
+};
+
+exports.updateMe = async (req, res) => {
+  if (req.body.password || req.body.passwordConfirm) {
+    return res.status(400).json({
+      message:
+        'This route is not for password updates. please use /update-my-password'
+    });
+  }
+
+  const filterBody = filterObj(req.body, 'name', 'email');
+
+  const updatedUser = await User.findByIdAndUpdate(req.user.id, filterBody, {
+    new: true,
+    runValidators: true
+  });
+
+  return res.status(200).json({ status: 'success', updatedUser });
 };
