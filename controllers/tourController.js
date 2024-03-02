@@ -8,6 +8,10 @@ exports.aliasToTours = (req, res, next) => {
   next();
 };
 
+// export.catchAsync=fn=>{
+//   fn(req,res,nex).catch(err=>next(err));
+// }
+
 exports.getAllTours = async (req, res) => {
   try {
     const features = new APIFeatures(Tour.find(), req.query)
