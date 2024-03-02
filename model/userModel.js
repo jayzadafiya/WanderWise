@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
-const { JsonWebTokenError } = require('jsonwebtoken');
 
 const userSchema = mongoose.Schema({
   name: {
@@ -67,7 +66,6 @@ userSchema.methods.changedPasswordAfter = function(JWTTimesStemp) {
       this.passwordChangedAt.getTime() / 1000,
       10
     );
-    console.log(JWTTimesStemp, changeedTimeStemp);
     return JWTTimesStemp < changeedTimeStemp;
   }
 

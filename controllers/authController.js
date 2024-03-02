@@ -10,6 +10,19 @@ const signToken = id => {
   });
 };
 
+const createSendToken = async (user, statusCode, res) => {
+  const token = signToken(user._id);
+
+  res.status(statusCode).json({
+    // message: 'User created  Succefully',
+    status: 'success',
+    token,
+    data: {
+      user
+    }
+  });
+};
+
 exports.signup = async (req, res) => {
   // const {
   //   name,
@@ -31,15 +44,7 @@ exports.signup = async (req, res) => {
       res.body
     );
 
-    const token = signToken(newUser._id);
-
-    res.status(201).json({
-      message: 'User created  Succefully',
-      token,
-      data: {
-        user: newUser
-      }
-    });
+    createSendToken(newUser, 201, res);
   } catch (error) {
     res.status(400).json({
       error,
@@ -62,15 +67,14 @@ exports.login = async (req, res) => {
       res.status(401).json({ message: 'Incorerct email or password' });
     }
 
-    // jwt.verify(process.env.JWT_SECRET);
-    const token = signToken(user._id);
-
+    // const token = signToken(user._id);
     // res.setHeader('Authorization', `Bearer ${token}`);
+    // res.status(200).json({
+    //   status: 'success',
+    //   token
+    // });
 
-    res.status(200).json({
-      status: 'success',
-      token
-    });
+    createSendToken(user, 200, res);
   } catch (error) {
     res.status(500).json({
       error,
@@ -206,11 +210,42 @@ exports.restPassword = async (req, res) => {
     // update changepassword property for the user
 
     // log the user in , send json token to client
-    const token = signToken(user._id);
-
-    return res.status(200).json({
-      token
+    createSendToken(User, 200, res);
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Error while reseting password',
+      error: error.message
     });
+  }
+};
+
+exports.updatePasswrod = async (req, res) => {
+  try {
+    //get user form collection
+    const user = await User.findById(req.user._id).select('+password');
+
+    if (!user) {
+      return res.status(400).json({
+        message: 'Token is unvalid or has expired'
+      });
+    }
+
+    //check if POSTed password is correct
+    if (
+      !(await user.correctPassword(req.body.passwordCurrent, user.password))
+    ) {
+      return res.status(401).json({
+        message: 'your current password is wrong'
+      });
+    }
+
+    //if so,updatepassword
+    user.password = req.body.password;
+    user.passwordConfirm = req.body.passwordConfirm;
+    await user.save();
+
+    //log user in send ,jwt
+    createSendToken(user, 200, res);
   } catch (error) {
     return res.status(500).json({
       message: 'Error while reseting password',
