@@ -4,6 +4,7 @@ const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
+const hpp = require('hpp');
 
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
@@ -34,6 +35,20 @@ app.use(mongoSanitize());
 
 //data sanitization aginest xss=html code with js convert to entity
 app.use(xss());
+
+//prevetn parameter polutions
+app.use(
+  hpp({
+    whitelist: [
+      'duration',
+      'difficulty',
+      'ratingsAverage',
+      'ratingsQuantity',
+      'maxGroupSize',
+      'price'
+    ]
+  })
+);
 
 //serving static file
 app.use(express.static(`${__dirname}/public`));
