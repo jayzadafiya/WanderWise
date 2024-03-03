@@ -71,5 +71,13 @@ exports.updateMe = async (req, res) => {
     runValidators: true
   });
 
-  return res.status(200).json({ status: 'success', updatedUser });
+  res.status(200).json({ status: 'success', updatedUser });
+};
+
+exports.deleteMe = async (req, res) => {
+  await User.findByIdAndUpdate(req.user.id, { active: false });
+
+  res.status(204).json({
+    status: 'success'
+  });
 };
