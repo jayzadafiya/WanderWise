@@ -12,6 +12,17 @@ const signToken = id => {
 
 const createSendToken = async (user, statusCode, res) => {
   const token = signToken(user._id);
+  const cookieOption = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    // secure: true,//use for production
+    httpOnly: true
+  };
+
+  res.cookie('jwt', token, cookieOption);
+  //remove password form output
+  user.password = undefined;
 
   res.status(statusCode).json({
     // message: 'User created  Succefully',
@@ -34,16 +45,15 @@ exports.signup = async (req, res) => {
   // } = req.body;
 
   try {
-    const newUser = await User.create(
-      // name,
-      // email,
-      // password,
-      // passwordConfirm,
-      // passwordChangedAt,
-      // role
-      res.body
-    );
-
+    // const newUser = await User.create(
+    //   // name,
+    //   // email,
+    //   // password,
+    //   // passwordConfirm,
+    //   // passwordChangedAt,
+    //   // role
+    // );
+    const newUser = await User.create(req.body);
     createSendToken(newUser, 201, res);
   } catch (error) {
     res.status(400).json({
