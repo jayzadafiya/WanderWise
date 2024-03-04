@@ -8,6 +8,7 @@ const hpp = require('hpp');
 
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
+const reivewRouter = require('./routes//reviewRoutes');
 
 const app = express();
 //set security HTTP headers
@@ -56,6 +57,7 @@ app.use(express.static(`${__dirname}/public`));
 // 3) ROUTES
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reivewRouter);
 
 app.all('*', (req, res, next) => {
   const err = new Error(`Cant't find ${req.originalUrl} on this server!`);
