@@ -1,7 +1,14 @@
 const Review = require('../model/reviewModel');
 
 exports.getAllReview = async (req, res) => {
-  const reviews = await Review.find();
+  let filter = {};
+
+  if (req.params.tourId) {
+    filter = {
+      tour: req.params.tourId
+    };
+  }
+  const reviews = await Review.find(filter);
 
   res.status(200).json({
     status: 'succuss',
@@ -13,12 +20,23 @@ exports.getAllReview = async (req, res) => {
 };
 
 exports.createReview = async (req, res) => {
-  const review = await Review.create(req.body);
+  try {
+    //allow nested routes
+    if (!req.body.tour) req.body.tour = req.params.tourId;
+    if (!req.body.user) req.body.user = req.user.id;
 
-  res.status(201).json({
-    status: 'succuss',
-    data: {
-      review
-    }
-  });
+    const review = await Review.create(req.body);
+
+    res.status(201).json({
+      status: 'succuss',
+      data: {
+        review
+      }
+    });
+  } catch (error) {
+    res.status(403).json({
+      error: error.message,
+      status: 'fail'
+    });
+  }
 };

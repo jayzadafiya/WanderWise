@@ -41,9 +41,8 @@ exports.getAllTours = async (req, res) => {
 
 exports.getTour = async (req, res) => {
   try {
-    console.log(req.params);
     const tour = await Tour.findById(req.params.id).populate('reviews');
-    console.log(tour);
+
     res.status(200).json({
       status: 'success',
       data: {

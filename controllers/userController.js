@@ -1,4 +1,3 @@
-const { json } = require('express');
 const User = require('../model/userModel');
 
 const filterObj = (obj, ...allowFields) => {
