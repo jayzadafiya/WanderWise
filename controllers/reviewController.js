@@ -1,42 +1,36 @@
+const factory = require('./handlerFactory');
 const Review = require('../model/reviewModel');
 
-exports.getAllReview = async (req, res) => {
-  let filter = {};
+exports.setTourAndUserId = (req, res, next) => {
+  if (!req.body.tour) req.body.tour = req.params.tourId;
+  if (!req.body.user) req.body.user = req.user.id;
 
-  if (req.params.tourId) {
-    filter = {
-      tour: req.params.tourId
-    };
-  }
-  const reviews = await Review.find(filter);
-
-  res.status(200).json({
-    status: 'succuss',
-    results: reviews.length,
-    data: {
-      reviews
-    }
-  });
+  next();
 };
 
-exports.createReview = async (req, res) => {
-  try {
-    //allow nested routes
-    if (!req.body.tour) req.body.tour = req.params.tourId;
-    if (!req.body.user) req.body.user = req.user.id;
+// exports.createReview = async (req, res) => {
+//   try {
+//     //allow nested routes
+//       if (!req.body.tour) req.body.tour = req.params.tourId;
+//       if (!req.body.user) req.body.user = req.user.id;
 
-    const review = await Review.create(req.body);
+//     const review = await Review.create(req.body);
 
-    res.status(201).json({
-      status: 'succuss',
-      data: {
-        review
-      }
-    });
-  } catch (error) {
-    res.status(403).json({
-      error: error.message,
-      status: 'fail'
-    });
-  }
-};
+//     res.status(201).json({
+//       status: 'succuss',
+//       data: {
+//         review
+//       }
+//     });
+//   } catch (error) {
+//     res.status(403).json({
+//       error: error.message,
+//       status: 'fail'
+//     });
+//   }
+// };
+exports.getAllReview = factory.getAll(Review);
+exports.createReview = factory.createOne(Review);
+exports.getReview = factory.getOne(Review);
+exports.deleteReview = factory.deleteOne(Review);
+exports.updateReview = factory.updateOne(Review);
