@@ -8,26 +8,20 @@ router.post('/signup', authController.signup);
 router.post('/login', authController.login);
 router.post('/forgot-password', authController.forgotPassword);
 router.patch('/reset-password/:token', authController.restPassword);
-router.patch(
-  '/update-my-password',
-  authController.protect,
-  authController.updatePasswrod
-);
 
-router.get(
-  '/me',
-  authController.protect,
-  userController.getMe,
-  userController.getUser
-);
-router.patch('/update-me', authController.protect, userController.updateMe);
-router.patch('/delete-me', authController.protect, userController.deleteMe);
+//proteect all route after this middelware
+router.use(authController.protect);
 
+router.patch('/update-my-password', authController.updatePasswrod);
+router.get('/me', userController.getMe, userController.getUser);
+router.patch('/update-me', userController.updateMe);
+router.patch('/delete-me', userController.deleteMe);
+
+router.use(authController.restrictTo('admin'));
 router
   .route('/')
   .get(userController.getAllUsers)
   .post(userController.createUser);
-
 router
   .route('/:id')
   .get(userController.getUser)
