@@ -28,15 +28,8 @@ exports.updateOne = Model => async (req, res) => {
   try {
     const doc = await Model.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
-      runValidator: true
+      runValidators: true
     });
-
-    if (!doc) {
-      res.status(404).json({
-        status: 'fail',
-        message: 'No document fond with this id '
-      });
-    }
 
     res.status(200).json({
       status: 'success',
