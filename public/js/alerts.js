@@ -5,8 +5,10 @@ export const hideAlert = () => {
   if (el) el.parentElement.removeChild(el);
 };
 
-// type is 'success' or 'error'
+// // type is 'success' or 'error'
 export const showAlert = (type, msg) => {
+  // console.log('ok');
+
   hideAlert();
   const markup = `<div class="alert alert--${type}">${msg}</div>`;
   document.querySelector('body').insertAdjacentHTML('afterbegin', markup);

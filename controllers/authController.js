@@ -68,13 +68,15 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      res.status(400).json({ message: 'Please provide email and password' });
+      return res
+        .status(400)
+        .json({ message: 'Please provide email and password' });
     }
 
     const user = await User.findOne({ email }).select('+password');
 
     if (!user || !(await user.correctPassword(password, user.password))) {
-      res.status(401).json({ message: 'Incorerct email or password' });
+      return res.status(401).json({ message: 'Incorerct email or password' });
     }
 
     // const token = signToken(user._id);
@@ -88,21 +90,31 @@ exports.login = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       error,
-      message: 'error in creating user'
+      status: 'fail',
+      message: 'error in logging user'
     });
   }
+};
+
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'logout', {
+    expires: new Date(Date.now() + 3 * 1000),
+    httpOnly: true
+  });
+  res.status(200).json({ status: 'success' });
 };
 
 exports.protect = async (req, res, next) => {
   try {
     let token;
 
-    //getting token
     if (
       req.headers.authorization &&
       req.headers.authorization.startsWith('Bearer')
     ) {
       token = req.headers.authorization.split(' ')[1];
+    } else if (req.cookies.jwt) {
+      token = req.cookies.jwt;
     }
 
     if (!token) {
@@ -126,7 +138,7 @@ exports.protect = async (req, res, next) => {
         .status(401)
         .json({ message: 'Password is change please Login again' });
     }
-
+    res.locals.user = freshUser;
     req.user = freshUser;
 
     next();
@@ -191,6 +203,7 @@ exports.forgotPassword = async (req, res) => {
     });
   }
 };
+
 exports.restPassword = async (req, res) => {
   // get user base on token
   const hashToken = crypto
@@ -262,4 +275,35 @@ exports.updatePasswrod = async (req, res) => {
       error: error.message
     });
   }
+};
+
+//only for render page
+exports.isLoggedIn = async (req, res, next) => {
+  if (req.cookies.jwt) {
+    try {
+      // 1) verify token
+      const decoded = await promisify(jwt.verify)(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+      );
+
+      // 2) Check if user still exists
+      const currentUser = await User.findById(decoded.id);
+      if (!currentUser) {
+        return next();
+      }
+
+      // 3) Check if user changed password after the token was issued
+      if (currentUser.changedPasswordAfter(decoded.iat)) {
+        return next();
+      }
+
+      // THERE IS A LOGGED IN USER
+      res.locals.user = currentUser;
+      return next();
+    } catch (err) {
+      return next();
+    }
+  }
+  next();
 };

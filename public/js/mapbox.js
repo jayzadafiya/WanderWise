@@ -1,50 +1,29 @@
+// Import the leaflet package
 /* eslint-disable */
-export const displayMap = locations => {
-  mapboxgl.accessToken =
-    'pk.eyJ1Ijoiam9uYXNzY2htZWR0bWFubiIsImEiOiJjam54ZmM5N3gwNjAzM3dtZDNxYTVlMnd2In0.ytpI7V7w7cyT1Kq5rT9Z1A';
 
-  var map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/jonasschmedtmann/cjvi9q8jd04mi1cpgmg7ev3dy',
-    scrollZoom: false
-    // center: [-118.113491, 34.111745],
-    // zoom: 10,
-    // interactive: false
-  });
+import L from 'leaflet';
 
-  const bounds = new mapboxgl.LngLatBounds();
+// Creates a leaflet map binded to an html <div> with id "map"
+// setView will set the initial map view to the location at coordinates
+// 13 represents the initial zoom level with higher values being more zoomed in
+const map = L.map('map').setView([43.659752, -79.378161], 20);
 
-  locations.forEach(loc => {
-    // Create marker
-    const el = document.createElement('div');
-    el.className = 'marker';
+// Adds the basemap tiles to your web map
+// Additional providers are available at: https://leaflet-extras.github.io/leaflet-providers/preview/
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution:
+    '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  subdomains: 'abcd',
+  maxZoom: 21
+}).addTo(map);
 
-    // Add marker
-    new mapboxgl.Marker({
-      element: el,
-      anchor: 'bottom'
-    })
-      .setLngLat(loc.coordinates)
-      .addTo(map);
-
-    // Add popup
-    new mapboxgl.Popup({
-      offset: 30
-    })
-      .setLngLat(loc.coordinates)
-      .setHTML(`<p>Day ${loc.day}: ${loc.description}</p>`)
-      .addTo(map);
-
-    // Extend map bounds to include current location
-    bounds.extend(loc.coordinates);
-  });
-
-  map.fitBounds(bounds, {
-    padding: {
-      top: 200,
-      bottom: 150,
-      left: 100,
-      right: 100
-    }
-  });
-};
+// Adds a popup marker to the webmap for GGL address
+L.circleMarker([38.829772, -77.30555])
+  .addTo(map)
+  .bindPopup(
+    '<b>Geography and Geoinformation Science Dept.</b><br>' +
+      'Exploratory Hall<br>' +
+      'George Mason University<br>' +
+      'Fairfax, VA'
+  )
+  .openPopup();

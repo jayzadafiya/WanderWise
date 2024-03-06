@@ -14,7 +14,10 @@ const userSchema = mongoose.Schema({
     unique: true,
     lowercase: true
   },
-  photo: String,
+  photo: {
+    type: String,
+    default: 'defalut.jpg'
+  },
   role: {
     type: String,
     default: 'user',
