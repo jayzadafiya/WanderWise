@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
 const crypto = require('crypto');
-const sendEmail = require('../utils/email.js');
+const Email = require('../utils/email.js');
 const User = require('../model/userModel.js');
 
 const signToken = id => {
@@ -54,10 +54,14 @@ exports.signup = async (req, res) => {
     //   // role
     // );
     const newUser = await User.create(req.body);
+    const url = `${req.protocol}://${req.get('host')}/me`;
+    await new Email(newUser, url).sendWelcome();
+
     createSendToken(newUser, 201, res);
   } catch (error) {
+    console.log(error);
     res.status(400).json({
-      error,
+      error: error.message,
       message: 'error in creating user'
     });
   }
@@ -190,6 +194,7 @@ exports.forgotPassword = async (req, res) => {
     //   message,
     //   subject: 'Your password reset Token'
     // });
+    await new Email(user,resetUrl).sendPasswordReset()
 
     return res.status(200).json({ message: 'Token send to email' });
   } catch (error) {

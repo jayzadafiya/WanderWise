@@ -25,6 +25,9 @@ exports.deleteOne = Model => {
 };
 
 exports.updateOne = Model => async (req, res) => {
+  // console.log(req.files);
+  // console.log(req.file);
+
   try {
     const doc = await Model.findByIdAndUpdate(req.params.id, req.body, {
       new: true,

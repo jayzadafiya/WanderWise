@@ -44,6 +44,8 @@ router
   .patch(
     authController.protect,
     authController.restrictTo('admin', 'lead-guide'),
+    tourController.uploadTourImages,
+    tourController.resizeTourImages,
     tourController.updateTour
   )
   .delete(
@@ -52,6 +54,22 @@ router
     tourController.deleteTour
   );
 
+router.patch(
+  '/imageCover/:id',
+  authController.protect,
+  authController.restrictTo('admin', 'lead-guide'),
+  tourController.uploadTourImageCover,
+  tourController.resizeTourImages,
+  tourController.updateTour
+);
+router.patch(
+  '/tour-images/:id',
+  authController.protect,
+  authController.restrictTo('admin', 'lead-guide'),
+  tourController.uploadTourImages,
+  tourController.resizeTourImages,
+  tourController.updateTour
+);
 // router.post(
 //   '/:tourId/reviews',
 //   authController.protect,

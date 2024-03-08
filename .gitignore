@@ -2,3 +2,6 @@
 
 package-lock.json
 .env
+
+.cache/
+/.cache/

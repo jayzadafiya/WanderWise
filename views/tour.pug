@@ -2,8 +2,7 @@ extends base
 include _reviewCard
 
 block append head
-  //- link(rel='stylesheet', href='https://unpkg.com/leaflet/dist/leaflet.css')
-  //- script(src='https://unpkg.com/leaflet/dist/leaflet.js')
+
 
 mixin overviewBox(label, text, icon)
   .overview-box__detail
@@ -84,6 +83,18 @@ block content
       .cta__content
         h2.heading-secondary What are you waiting for?
         p.cta__text= `${tour.duration} days. 1 adventure. Infinite memories. Make it yours today!`
-        button.btn.btn--green.span-all-rows Book tour now!
 
+        if user
+          button.btn.btn--green.span-all-rows#book-tour(data-tour-id=`${tour.id}`) Book tour now!
+        else 
+          a.btn.btn--green.span-all-rows(href='/login') Log in to book tour
+  h1 File Upload Form
+    form
+      label(for='imageCover') Upload Image Cover:
+      input(type='file' name='imageCover' id='imageCover' accept='image/*')
+      br
+      label(for='images') Upload Images (up to 3):
+      input(type='file' name='images' id='images' accept='image/*' multiple)
+      br
+      button#tour-form(data-tour-id=`${tour.id}`) Upload
   //- script(type='text/javascript' src='../login.js')
